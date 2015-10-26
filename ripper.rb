@@ -22,14 +22,6 @@ class DiscSpinner
   # utils
   #
   
-  def what_device
-    external('/usr/bin/drutil status', silent: true).lines.grep(/Name:/).first[/Name:\s+(.+)$/, 1]
-  end
-  
-  def disc_present
-    external('/usr/bin/drutil status', silent: true).lines.grep(/No Media/).empty?
-  end
-
   def fetch_tracks
     @tracks = []
     disc = ''
@@ -82,7 +74,7 @@ class DiscSpinner
 
   def eject
     set_state :ejecting
-    external '/usr/bin/drutil eject'
+    PLATFORM.eject
     set_state :idle
   end
   
@@ -124,7 +116,7 @@ class DiscSpinner
   end
   
   def idle_state
-    if disc_present
+    if PLATFORM.disc_present
       set_state :present
       @queue = Queue.new
     else
